@@ -164,6 +164,7 @@ jobs:
         if: github.event_name == 'push'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}  
           password: ${{ secrets.DOCKER_PASSWORD }}
       - uses: actions/download-artifact@v3
         with:
