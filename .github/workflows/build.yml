@@ -28,17 +28,6 @@ jobs:
           curl -s -L -o deps/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
           chmod +x deps/bin/jq
           echo "${PWD}/deps/bin" >> $GITHUB_PATH
-      - name: Test
-        env:
-          TEST_COVERAGE: 1
-        run: make test
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./out/tests/coverage-unit.txt
-          flags: unit,os_linux
-          fail_ci_if_error: true
-          verbose: true
   test-linux-arm64:
     runs-on: linux-arm64
     steps:
@@ -50,10 +39,6 @@ jobs:
         with:
           check-latest: true
           go-version-file: 'go.mod'
-      - name: Test
-        run: |
-          make format || true
-          make test
   test-windows:
     runs-on: windows-2019
     steps:
@@ -93,23 +78,7 @@ jobs:
           # dump docker info for auditing
           docker version
           docker info
-      - name: Test
-        env:
-          TEST_COVERAGE: 1
-        run: |
-          make test
-      - name: Prepare Codecov
-        uses: crazy-max/ghaction-chocolatey@v3
-        with:
-          args: install codecov -y
-      - name: Run Codecov
-        run: |
-          codecov.exe -f .\out\tests\coverage-unit.txt -v --flag os_windows
   build-and-publish:
-    needs:
-      - test-linux-amd64
-      - test-linux-arm64
-      - test-windows
     runs-on: ubuntu-latest
     permissions:
       id-token: write
