@@ -28,56 +28,6 @@ jobs:
           curl -s -L -o deps/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
           chmod +x deps/bin/jq
           echo "${PWD}/deps/bin" >> $GITHUB_PATH
-  test-linux-arm64:
-    runs-on: linux-arm64
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - name: Setup go
-        uses: actions/setup-go@v4
-        with:
-          check-latest: true
-          go-version-file: 'go.mod'
-  test-windows:
-    runs-on: windows-2019
-    steps:
-      - name: Set git to use LF and symlinks
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global core.symlinks true
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - name: Setup go
-        uses: actions/setup-go@v4
-        with:
-          check-latest: true
-          go-version-file: 'go.mod'
-      - name: Add runner IP to daemon insecure-registries and firewall
-        shell: powershell
-        run: |
-          # Get IP from default gateway interface
-          $IPAddress=(Get-NetIPAddress -InterfaceAlias ((Get-NetRoute "0.0.0.0/0").InterfaceAlias) -AddressFamily IPv4)[0].IPAddress
-
-          # Allow container-to-host registry traffic (from public interface, to the same interface)
-          New-NetfirewallRule -DisplayName test-registry -LocalAddress $IPAddress -RemoteAddress $IPAddress
-
-          # create or update daemon config to allow host as insecure-registry
-          $config=@{}
-          if (Test-Path C:\ProgramData\docker\config\daemon.json) {
-            $config=(Get-Content C:\ProgramData\docker\config\daemon.json | ConvertFrom-json)
-          }
-          $config | Add-Member -Force -Name "insecure-registries" -value @("$IPAddress/32") -MemberType NoteProperty
-          $config | Add-Member -Force -Name "allow-nondistributable-artifacts" -value @("$IPAddress/32") -MemberType NoteProperty
-          ConvertTo-json $config | Out-File -Encoding ASCII C:\ProgramData\docker\config\daemon.json
-
-          Restart-Service docker
-
-          # dump docker info for auditing
-          docker version
-          docker info
   build-and-publish:
     runs-on: ubuntu-latest
     permissions:
@@ -159,8 +109,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: lifecycle-bom-cdx-sha256
-          path: lifecycle-v*-bom.cdx.json.sha256
-      - uses: azure/docker-login@v1
+          path: lifecycle-v*-bom.cdx.json.sha256}
+      - uses: docker/login-action@v2
         if: github.event_name == 'push'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
