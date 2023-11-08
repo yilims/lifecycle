@@ -57,72 +57,72 @@ jobs:
         run: |
           DOCKER_CLI_EXPERIMENTAL=enabled
 
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-x86-64
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-arm64
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-s390x@${{ env.LINUX_S390X_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-s390x
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-windows@${{ env.WINDOWS_AMD64_SHA }} ${{ env.LIFECYCLE_VERSION }}-windows
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-x86-64
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-arm64
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-s390x@${{ env.LINUX_S390X_SHA }} ${{ env.LIFECYCLE_VERSION }}-linux-s390x
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-windows@${{ env.WINDOWS_AMD64_SHA }} ${{ env.LIFECYCLE_VERSION }}-windows
 
-          docker manifest create buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-s390x@${{ env.LINUX_S390X_SHA }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-windows@${{ env.WINDOWS_AMD64_SHA }}
+          docker manifest create yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-linux-s390x@${{ env.LINUX_S390X_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}-windows@${{ env.WINDOWS_AMD64_SHA }}
 
-          MANIFEST_SHA=$(docker manifest push buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }})
+          MANIFEST_SHA=$(docker manifest push yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }})
           echo "MANIFEST_SHA: $MANIFEST_SHA"
 
           cosign sign -r -y \
             -a tag=${{ env.LIFECYCLE_VERSION }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}@${MANIFEST_SHA}
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}@${MANIFEST_SHA}
           cosign verify \
             --certificate-identity-regexp "https://github.com/${{ github.repository_owner }}/lifecycle/.github/workflows/post-release.yml" \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
             -a tag=${{ env.LIFECYCLE_VERSION }} \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
 
-          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
+          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
           cosign sign -r -y \
             -a tag=${{ env.LIFECYCLE_VERSION }} --attachment sbom \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}@${MANIFEST_SHA}
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}@${MANIFEST_SHA}
           cosign verify \
             --certificate-identity-regexp "https://github.com/${{ github.repository_owner }}/lifecycle/.github/workflows/post-release.yml" \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
             -a tag=${{ env.LIFECYCLE_VERSION }} --attachment sbom \
-            buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
+            yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_VERSION }}
       - name: Retag lifecycle images & create manifest list - latest
         if: "!contains(env.LIFECYCLE_VERSION, 'rc') && !contains(env.LIFECYCLE_VERSION, 'pre')"
         run: |
           DOCKER_CLI_EXPERIMENTAL=enabled
 
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} latest-linux-x86-64
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} latest-linux-arm64
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-s390x@${{ env.LINUX_S390X_SHA }} latest-linux-s390x
-          crane tag buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-windows@${{ env.WINDOWS_AMD64_SHA }} latest-windows
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-x86-64@${{ env.LINUX_AMD64_SHA }} latest-linux-x86-64
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-arm64@${{ env.LINUX_ARM64_SHA }} latest-linux-arm64
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-linux-s390x@${{ env.LINUX_S390X_SHA }} latest-linux-s390x
+          crane tag yilitest.azurecr.io/buildpacksio/lifecycle:${{ env.LIFECYCLE_IMAGE_TAG }}-windows@${{ env.WINDOWS_AMD64_SHA }} latest-windows
 
-          docker manifest create buildpacksio/lifecycle:latest \
-            buildpacksio/lifecycle:latest-linux-x86-64@${{ env.LINUX_AMD64_SHA }} \
-            buildpacksio/lifecycle:latest-linux-arm64@${{ env.LINUX_ARM64_SHA }} \
-            buildpacksio/lifecycle:latest-linux-s390x@${{ env.LINUX_S390X_SHA }} \
-            buildpacksio/lifecycle:latest-windows@${{ env.WINDOWS_AMD64_SHA }}
+          docker manifest create yilitest.azurecr.io/buildpacksio/lifecycle:latest \
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest-linux-x86-64@${{ env.LINUX_AMD64_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest-linux-arm64@${{ env.LINUX_ARM64_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest-linux-s390x@${{ env.LINUX_S390X_SHA }} \
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest-windows@${{ env.WINDOWS_AMD64_SHA }}
 
-          MANIFEST_SHA=$(docker manifest push buildpacksio/lifecycle:latest)
+          MANIFEST_SHA=$(docker manifest push yilitest.azurecr.io/buildpacksio/lifecycle:latest)
           echo "MANIFEST_SHA: $MANIFEST_SHA"
 
           cosign sign -r -y \
             -a tag=latest \
-            buildpacksio/lifecycle:latest@${MANIFEST_SHA}
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest@${MANIFEST_SHA}
           cosign verify \
             --certificate-identity-regexp "https://github.com/${{ github.repository_owner }}/lifecycle/.github/workflows/post-release.yml" \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
             -a tag=latest \
-            buildpacksio/lifecycle:latest
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest
 
-          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx buildpacksio/lifecycle:latest
+          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx yilitest.azurecr.io/buildpacksio/lifecycle:latest
           cosign sign -r -y \
             -a tag=${{ env.LIFECYCLE_VERSION }} --attachment sbom \
-            buildpacksio/lifecycle:latest@${MANIFEST_SHA}
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest@${MANIFEST_SHA}
           cosign verify \
             --certificate-identity-regexp "https://github.com/${{ github.repository_owner }}/lifecycle/.github/workflows/post-release.yml" \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
             -a tag=${{ env.LIFECYCLE_VERSION }} --attachment sbom \
-            buildpacksio/lifecycle:latest
+            yilitest.azurecr.io/buildpacksio/lifecycle:latest
