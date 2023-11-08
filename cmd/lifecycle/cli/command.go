@@ -73,10 +73,6 @@ func Run(c Command, withPhaseName string, asSubcommand bool) {
 	if err := c.Args(flagSet.NArg(), flagSet.Args()); err != nil {
 		cmd.Exit(err)
 	}
-	cmd.DefaultLogger.Debugf("Ensuring privileges...")
-	if err := c.Privileges(); err != nil {
-		cmd.Exit(err)
-	}
 	cmd.DefaultLogger.Debugf("Executing command...")
 	cmd.Exit(c.Exec())
 }
